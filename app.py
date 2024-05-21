@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request
 import stripe 
-import os
+# import os
+from decouple import config
+
 from dotenv import load_dotenv
 # import checkout.html
 load_dotenv()
@@ -9,11 +11,12 @@ load_dotenv()
 app = Flask(__name__)
 
 stripe_keys = {
-        "secret_key": os.getenv("STRIPE_SECRET_KEY"),
-        "publishable_key": os.getenv("STRIPE_PUBLISHABLE_KEY"),
+        "secret_key": config("STRIPE-SECRETKEY"),
+        "publishable_key": config("STRIPE-PUBLISHABLEKEY"),
     }
 
 stripe.api_key = stripe_keys["secret_key"]
+print(config("STRIPE-SECRETKEY"))
 
 @app.route('/')
 def checkout():
@@ -22,7 +25,7 @@ def checkout():
 @app.route('/charge', methods=['POST'])
 def charge():
         # Amount in cents
-        # amount = 1000
+        amount = 2000
 
         customer = stripe.Customer.create(
             email='customer@example.com',
@@ -40,4 +43,5 @@ def charge():
 
 
 if __name__ == '__main__':
-        app.run()
+        app.run(debug=True)
+        
