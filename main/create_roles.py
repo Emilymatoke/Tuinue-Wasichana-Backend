@@ -1,4 +1,4 @@
-from models import User , Role , db
+from main.models import User , Role , db
 
 def create_roles ():
     administrator= Role(id=1,name='administrator')

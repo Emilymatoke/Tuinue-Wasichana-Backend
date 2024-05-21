@@ -1,16 +1,17 @@
 from flask import flash, request, jsonify, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
-from models import db, User, Charity, Donation, Beneficiary
-from auth import role_required, Role
+from main.models import db, User, Charity, Donation, Beneficiary
+from main.auth import role_required
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_restful import Api, Resource
+from main.roles import Role 
 
 api = Api()
 
 def register_routes(app):
     api.init_app(app)
 
-    @app.route('/api/login', methods=['POST'])
+    @app.route('/login', methods=['POST'])
     def login():
         email = request.json.get('email')
         password = request.json.get('password')
@@ -21,19 +22,19 @@ def register_routes(app):
         flash('Login successful')
         return redirect(url_for('home'))
 
-    @app.route('/api/charities', methods=['GET'])
+    @app.route('/charities', methods=['GET'])
     @role_required(Role.DONOR)
     def view_charities():
         charities = Charity.query.all()
         return jsonify([charity.serialize() for charity in charities])
 
-    @app.route('/api/charities/choose_charity', methods=['POST'])
+    @app.route('/charities/choose_charity', methods=['POST'])
     @login_required
     def choose_charity():
         flash('Charity chosen successfully')
         return redirect(url_for('make_donation'))
 
-    @app.route('/api/donate', methods=['POST'])
+    @app.route('/donate', methods=['POST'])
     @login_required
     def make_donation():
         data = request.json
@@ -61,14 +62,14 @@ def register_routes(app):
         db.session.commit()
         return jsonify({'message': 'Charity application submitted successfully'})
 
-    @app.route('/api/non_anonymous_donors', methods=['GET'])
+    @app.route('/non_anonymous_donors', methods=['GET'])
     @login_required
     def view_non_anonymous_donors():
         donors = Donation.query.filter_by(is_anonymous=False).all()
         donor_data = [{'donor_name': donor.user.username, 'amount_donated': donor.amount} for donor in donors]
         return jsonify({'non_anonymous_donors': donor_data})
 
-    @app.route('/api/total_donations', methods=['GET'])
+    @app.route('/total_donations', methods=['GET'])
     @login_required
     def view_total_donations():
         total_donations = sum(donation.amount for donation in Donation.query.all())

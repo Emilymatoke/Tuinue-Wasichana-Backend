@@ -1,12 +1,12 @@
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from models import User
-from roles import Role  # Import Role class
+from main.models import User
+ # Import Role class
 
 login_manager = LoginManager()
 
 def init_login_manager(app):
     login_manager.init_app(app)
-    login_manager.login_view = 'login'
+    login_manager.login_view = 'auth.login'
 
 @login_manager.user_loader
 def load_user(user_id):
