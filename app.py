@@ -2,11 +2,11 @@
 # from main.app_routes import register_routes
 # from main import create_app,db
 from flask import Flask, render_template, request
-import stripe  # type: ignore
+import stripe  
 # import os
-from decouple import config # type: ignore
+from decouple import config
 
-from dotenv import load_dotenv # type: ignore
+from dotenv import load_dotenv 
 # import checkout.html
 load_dotenv()
 
