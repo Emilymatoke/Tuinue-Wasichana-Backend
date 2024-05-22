@@ -1,63 +1,50 @@
 
-# from main.app_routes import register_routes
-# from main import create_app,db
-from flask import Flask, render_template, request
-import stripe  
-# import os
-from decouple import config
-
-from dotenv import load_dotenv 
-# import checkout.html
-load_dotenv()
-
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, unset_jwt_cookies
+from datetime import timedelta
+# from models import db, User, Charity, Beneficiary, Transaction, Donor
+# from config import DATABASE_CONFIG  # Import the config
+import secrets
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
+# app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DATABASE_CONFIG['user']}:{DATABASE_CONFIG['pw']}@{DATABASE_CONFIG['host']}:{DATABASE_CONFIG['port']}/{DATABASE_CONFIG['db']}"
 
-stripe_keys = {
-        "secret_key": config("STRIPE-SECRETKEY"),
-        "publishable_key": config("STRIPE-PUBLISHABLEKEY"),
-    }
+# Generate a random secret key
+jwt_secret_key = secrets.token_hex(32)  # Generate a 32-byte (256-bit) random key
 
-stripe.api_key = stripe_keys["secret_key"]
-print(config("STRIPE-SECRETKEY"))
+# Set the JWT_SECRET_KEY in your Flask app's configuration
+app.config['JWT_SECRET_KEY'] = jwt_secret_key
 
+# Initialize extensions
+# db.init_app(app)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
+
+# URL Routing
 @app.route('/')
-def checkout():
-        return render_template('checkout.html',key=stripe_keys['publishable_key'])
-
-@app.route('/charge', methods=['POST'])
-def charge():
-        # Amount in cents
-        amount = 2000
-
-        customer = stripe.Customer.create(
-            email='customer@example.com',
-            source=request.form['stripeToken']
-        )
-
-        charge = stripe.Charge.create(
-            customer=customer.id,
-            amount=amount,
-            currency='usd',
-            description='Flask Charge'
-        )
-
-        return render_template('charge.html', amount=amount)
+def index():
+    return "This is a basic Flask application"
 
 
+
+# Admin LOgin Route with JWT Authentication
+@app.route('/adminlogin', methods=['POST'])
+def admin_login():
+    data = request.get_json()
+    
+    #checking the login credentials
+    if data['email'] == 'admin@gmail.com' and data['password'] == 'password':
+       expiration_time =  timedelta(hours=1)
+       token = create_access_token(identity='admin', expires_delta=expiration_time)
+       
+       return jsonify({"success": True, "message": "login successful", "token": token, 'user_email': data['email'], 'role': 'admin'}), 200
+   
+    else:
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401
+    
+    
 if __name__ == '__main__':
-        app.run(debug=True)
-        
-
-# app = create_app()
-# register_routes(app)
-# if __name__ == '__main__':
-#     # with app.app_context():
-#     #     db.create_all()
-#     app.run(port=5555, debug=True)
-
-
-
-
-
-
+    app.run(debug=True)
