@@ -1,7 +1,7 @@
 DATABASE_CONFIG = {
     'user': 'postgres',
     'pw': '#Sulumeti28',
-    'dbname': 'tuinue',
+    'db': 'tuinue',
     'host': 'localhost',
     'port': '5432',
 }
