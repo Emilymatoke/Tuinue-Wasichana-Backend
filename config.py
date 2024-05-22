@@ -1,9 +1,7 @@
-# configuration
-
-CONFIG_MODE = {
-    "user" : "postgres",
-    "password" : "#Sulumeti28",
-    "host" : "localhost",
-    "port" : "5432",
-    "database" : "tuinue"
+DATABASE_CONFIG = {
+    'user': 'postgres',
+    'pw': '#Sulumeti28',
+    'dbname': 'tuinue',
+    'host': 'localhost',
+    'port': '5432',
 }
