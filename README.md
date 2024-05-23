@@ -13,3 +13,4 @@ pip install flask  flask_cors flask_bcrypt flask_jwt_extended
 pip install flask flask-sqlalchemy
 pip install alembic
 alembic init alembic
+pip install psycopg2-binary
